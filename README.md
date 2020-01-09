@@ -15,23 +15,23 @@ There are 6 Components:
 1. Git Pull for three Repositories : FraudDetection,CreditcardProducer,Fraud-alert-dashboard
 
 2. Before starting Jobs we need to have Cassandra in place, here are the steps:
-   - (Pull Casssandra Image)
+   - Pull Casssandra Image
    ```
 	docker pull datastax/dse-server:5.1.5 
-
+   ```
    - Pull Cassandra Studio Image (Web GUI)
    ```
 	docker pull datastax/dse-studio:latest 
-
+   ```
    - Run Cassandra container
    ```
    docker run -p 9042:9042 -e DS_LICENSE=accept --memory 4g --name my-dse -d datastax/dse-server:5.1.5 
-
+   ```
    - Run Cassandra Studio
    ```
    docker run -e DS_LICENSE=accept --link my-dse -p 9091:9091 --memory 1g --name my-studio -d datastax/dse-studio
- 
-   -  Connect to Cassandra Studio: http://localhost:9091/  
+   ```
+   - Connect to Cassandra Studio: http://localhost:9091/  
 	- > Go to Tab "Working with CQL 6.0.0" 
 	- > Test Connection change host name to my-dse and Test & Save. 
   
@@ -68,7 +68,7 @@ Alternatively import Notebook  FraudDetection_Notebook.tar (present in FraudDete
 	      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 	    volumes:
 	      - /var/run/docker.sock:/var/run/docker.sock
-		
+	 ```	
      - Go to folder kafka-docker and run docker-compose up -d  (This will run Zookeeper, Kafka @ 9092  with the topic "creditTransaction" alreday created)
      - Now run the Streaming Job which will listen to Kafka Topic : FraudDetection/src/main/scala/com/datamantra/spark/jobs/RealTimeFraudDetection/DstreamFraudDetection.scala 
      - Note: This will not get any messages yet since the Kafaka Topic is empty.Next we will populate the topic with data.
