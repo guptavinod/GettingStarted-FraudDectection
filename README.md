@@ -15,18 +15,34 @@ There are 6 Components:
 1. Git Pull for three Repositories : FraudDetection,CreditcardProducer,Fraud-alert-dashboard
 
 2. Before starting Jobs we need to have Cassandra in place, here are the steps:
- - docker pull datastax/dse-server:5.1.5 (Pull Casssandra Image)
- - docker pull datastax/dse-studio:latest (Pull Cassandra Studio Image (Web GUI) )
- - docker run -p 9042:9042 -e DS_LICENSE=accept --memory 4g --name my-dse -d datastax/dse-server:5.1.5 (Run Cassandra container)
- - docker run -e DS_LICENSE=accept --link my-dse -p 9091:9091 --memory 1g --name my-studio -d datastax/dse-studio
- (Run Cassandra Studio)
- -  Connect to Cassandra Studio: http://localhost:9091/  > Go to Tab "Working with CQL 6.0.0" > Test Connection change host name to my-dse and Test & Save. 
- - In Studio : Create Key Space and Tables using : creditcard.sql (FraudDetection/src/main/resources/cassandra/creditcard.cql). Alternatively import Notebook  FraudDetection_Notebook.tar (present in FraudDetection folder).
- - 4 Tables are created : customer, fraud_transaction, non_fraud_transaction, kafka_offset
+   - (Pull Casssandra Image)
+   ```
+	docker pull datastax/dse-server:5.1.5 
+
+   - Pull Cassandra Studio Image (Web GUI)
+   ```
+	docker pull datastax/dse-studio:latest 
+
+   - Run Cassandra container
+   ```
+   docker run -p 9042:9042 -e DS_LICENSE=accept --memory 4g --name my-dse -d datastax/dse-server:5.1.5 
+
+   - Run Cassandra Studio
+   ```
+   docker run -e DS_LICENSE=accept --link my-dse -p 9091:9091 --memory 1g --name my-studio -d datastax/dse-studio
+ 
+   -  Connect to Cassandra Studio: http://localhost:9091/  
+	- > Go to Tab "Working with CQL 6.0.0" 
+	- > Test Connection change host name to my-dse and Test & Save. 
+  
+   - In Studio : Create Key Space and Tables using : creditcard.sql (FraudDetection/src/main/resources/cassandra/creditcard.cql). 
+Alternatively import Notebook  FraudDetection_Notebook.tar (present in FraudDetection folder).
+
+   - **4 Tables are created :** customer, fraud_transaction, non_fraud_transaction, kafka_offset
 
  3. Move to   Project > Fraud-alert-dashboard :
    - Run Fraud-alert-dashboard/src/main/java/com/datamantra/fraudalertdashboard/dashboard/FraudAlertDashboard.java
-   -  Open localhost:8080 (You'll see dashboard without data since we have not pushed data in Cassandra - we will do it next)
+   - Open localhost:8080 (You'll see dashboard without data since we have not pushed data in Cassandra - we will do it next)
 
  4. Now move to Project > FraudDetection and run the requiered jobs as explained below:
   - Job1: FraudDetection/src/main/scala/com/datamantra/spark/jobs/IntialImportToCassandra.scala (Load data in customer, fraud_transaction, non_fraud_transaction tables)
@@ -35,23 +51,23 @@ There are 6 Components:
      -  git clone https://github.com/wurstmeister/kafka-docker
      - Replace the code in kafka-docker > docker-compose.yml with:
 	 
-	   ```
-		    version: '2'
-			services:
-			  zookeeper:
-				image: wurstmeister/zookeeper
-				ports:
-				  - "2181:2181"
-			  kafka:
-				build: .
-				ports:
-				  - "9092:9092"
-				environment:
-				  KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
-				  KAFKA_CREATE_TOPICS: "creditcardTransaction"
-				  KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-				volumes:
-				  - /var/run/docker.sock:/var/run/docker.sock
+	```
+	version: '2'
+	services:
+	  zookeeper:
+	    image: wurstmeister/zookeeper
+	    ports:
+	      - "2181:2181"
+	  kafka:
+	    build: .
+	    ports:
+	      - "9092:9092"
+	    environment:
+	      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
+	      KAFKA_CREATE_TOPICS: "creditcardTransaction"
+	      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+	    volumes:
+	      - /var/run/docker.sock:/var/run/docker.sock
 		
      - Go to folder kafka-docker and run docker-compose up -d  (This will run Zookeeper, Kafka @ 9092  with the topic "creditTransaction" alreday created)
      - Now run the Streaming Job which will listen to Kafka Topic : FraudDetection/src/main/scala/com/datamantra/spark/jobs/RealTimeFraudDetection/DstreamFraudDetection.scala 
@@ -60,14 +76,14 @@ There are 6 Components:
  5. Move to Project > CreditcardProducer
     - Run with Configurtaion: CreditcardProducer/src/main/scala/com/datamantra/producer/TrasactionProducer.scala : src/main/resources/application-local.conf (in Program Arguments)
 	
- 6 This above step starts pushing transaction data into kafaka from where the DstreamFraudDetection Job will start consuming messages and work with generated Models and push data back to Cassandra after predictions.
+ 6. This above step starts pushing transaction data into kafaka from where the DstreamFraudDetection Job will start consuming messages and work with generated Models and push data back to Cassandra after predictions.
  
  7. Check Dashboard: Now you'll also see the Dashboard being populated with the Fraud Transaction Records.
       	  
  
 ![High-level Architectural Diagram](readme-images/FraudDetectionArchitecture.png)
 
-# What does the ApP DO? 
+# What does the App DO? 
 
   1. Initially we have 2 Data Sets - Customer and Transactions Tables. These Transaction table is having all the Fraud & Non Fraud Data classified based on Actuals (Not Predicted)
   2. Customer is stored directly in Cassandra Customer Table while Transcation is Split into 2 Tables Fraud-Txn and Non-Fraud Txn(Age & Distance fields are added in both Txn Tables using help of Customer Table)
@@ -77,25 +93,26 @@ There are 6 Components:
   6. Note: These are just predictions once actuals are confirmed the INtiall Transaction data is again used to create Model - so to have robust and slowly trained Model. This is what would the Airflow automation script would help us do (to an extent)
   7. The Ideal situation would be when the Predicted Fraud Transactions and Actually Fraud (or to nearest accuracy) 
   
-  Limitations:
+# Limitations:
+
   1. The Predication Tables are not seprated out from Actual Tabels. Ideally, once the predictions are validated they shoul move back to the main/actual db.
   2. After moving the validated predictions to the Actual DB - peredically the model should be re-generated from the Actual data and then same cycle shuld start. 
  
  
  
- # ML FLOW
+# ML FLOW
 ![High-level Architectural Diagram](readme-images/Spark-ML-Job.png)
 ![High-level Architectural Diagram](readme-images/Spark-ML-Job-(AlgorithmExplaination).png)
  
-  StrinIndexer - 1st Stage of Pipeline 
+  **StrinIndexer - 1st Stage of Pipeline**
   This will transform all the selected columns into Double Values because the ML Algo will not understand String Values but Only Doubble Values
  
   
-  OneHotEncoder - 2nd Stage of Pipeline 
+  **OneHotEncoder - 2nd Stage of Pipeline**
   This will normalize the Double Values (generated by StringIndexer) 
   
   
-   VectorAssembler - 3rd Stage of Pipeline 
+  **VectorAssembler - 3rd Stage of Pipeline**
    This will assemble all the transformed columns into ONE Coloumn - this column is called FEATURE COLUMN and the Value of this column is an Vector.
    This FEATURE COLUMN will enable us to Train ON this Data Frame and  will be served as an input to the Model Creation Algorithm.
   
@@ -107,7 +124,8 @@ There are 6 Components:
    After K-MEANS and  Random Forest flow below the final Random Forest Model will also be saved. [This is used for Predictions of Realtime Data]
   
   
-   How would K-Means Work here?   This will basically reduce the Normal (Non-Fraud) Transactions as explained below (Check the Diagram):
+   **How would K-Means Work here?**
+   This will basically reduce the Normal (Non-Fraud) Transactions as explained below (Check the Diagram):
   1. The output of Vector Assembler i.e. FETAURE COLUMN is split  into 2 Data Frames - NON-FRaud and FRaud.
   2. The Non-Fraud DF will be the first input to K-MEANS (which basically needs to be reduced)
   3. Second Input to KMEANS is No. of CLUSTERED CENTROID = No of Fraud Transactions
@@ -121,7 +139,7 @@ There are 6 Components:
    
   This is SPark Streaming Job and a Consumer of Kafka Topic genertaed by the Simulator. We devide it in 2 parts
  
- Part 1- Consuming Streams from Kafka
+ **Part 1- Consuming Streams from Kafka**
   1. Read Customer Data from Cassandra
   2. This will be used to calulate Age & Distance (between Customer and Merchant place using bot partys LAt & Long). These will also be used as Feature columns in ML.
   3. After that we load both the Models (Preprocessed & Random Forest)stored in File System (generated by Initial Data). 
@@ -135,7 +153,11 @@ There are 6 Components:
   11. After this Initialize Kafaka Consumer Configurations like group-id auto-offset-rest etc.
   12. Next we connect to direct kafka stream and the app starts reading messages from kafka. Offset is used to ensure we dont read already read messages when this streaming application is re-started.
   
-  Part 2 - Processing Transactions and Saving Predctions
-  1. The dstream contains 3 things : i) value = all the transaction messages in 5 second interval (ii) partition (iii) offset (Note offset is per partition)
+ **Part 2 - Processing Transactions and Saving Predctions**
+  1. The dstream contains 3 things : 
+	- value = all the transaction messages in 5 second interval 
+	- partition 
+	- offset (Note offset is per partition)
   2. Then ALL the incoming messages contained in DsTREAM RDD are processed first with Prepprocessor Model and than the Feature Column genertaed is passed  into the Random Forest transformation to Predict whether the given message in Fraudant or not.
   3. Now through CassndraConnetor using prepared statements insert the Fraudant records in Fraud Txn Table and Non-Fraud in Non-Fraud Txn Table and finally update Offeset in Ke-offset Table after each insertion.
+
