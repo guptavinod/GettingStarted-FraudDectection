@@ -54,12 +54,7 @@ Alternatively import Notebook  FraudDetection_Notebook.tar (present in current r
    ```  
     > docker-compose -f docker-compose-kafka-echosystem.yml up -d
    ```
-  - Open the Kafka UI  @ localhost:9000 and once you deploy the stream (as we'll see below) - you can monitor all the topics, partitions  and messages. 
-  - Note: Within the yml file, we have mentioned topic as environment variable e.g.
-   ```
-	KAFKA_CREATE_TOPICS: "creditcardTransaction"
-   ```
-   This will create above mentiiond topic automatically. 
+  - Open the Kafka UI  @ localhost:9000 and once you deploy the stream (as we'll see below) - you can monitor all the topics, partitions  and messages. Kafka Topic will be created automatically whenever any job start push/pull messages in kafka topic queue. 
       
    - Now run the Streaming Job which will listen to Kafka Topic : FraudDetection/src/main/scala/com/datamantra/spark/jobs/RealTimeFraudDetection/DstreamFraudDetection.scala 
    - Note: This will not get any messages yet since the Kafaka Topic is empty.Next we will populate the topic with data.
