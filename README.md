@@ -37,7 +37,7 @@ There are 6 Components:
   
    - In Studio : Create Key Space and Tables using : 
 	creditcard.sql (FraudDetection/src/main/resources/cassandra/creditcard.cql). 
-Alternatively import Notebook  FraudDetection_Notebook.tar (present in FraudDetection folder).
+Alternatively import Notebook  FraudDetection_Notebook.tar (present in current repository folder).
 
    - **4 Tables are created :** customer, fraud_transaction, non_fraud_transaction, kafka_offset
 
@@ -61,8 +61,8 @@ Alternatively import Notebook  FraudDetection_Notebook.tar (present in FraudDete
    ```
    This will create above mentiiond topic automatically. 
       
-     - Now run the Streaming Job which will listen to Kafka Topic : FraudDetection/src/main/scala/com/datamantra/spark/jobs/RealTimeFraudDetection/DstreamFraudDetection.scala 
-     - Note: This will not get any messages yet since the Kafaka Topic is empty.Next we will populate the topic with data.
+   - Now run the Streaming Job which will listen to Kafka Topic : FraudDetection/src/main/scala/com/datamantra/spark/jobs/RealTimeFraudDetection/DstreamFraudDetection.scala 
+   - Note: This will not get any messages yet since the Kafaka Topic is empty.Next we will populate the topic with data.
 	  
  5. Move to Project > CreditcardProducer
     - Run with Configurtaion: CreditcardProducer/src/main/scala/com/datamantra/producer/TrasactionProducer.scala : src/main/resources/application-local.conf (in Program Arguments)
