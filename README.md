@@ -35,7 +35,8 @@ There are 6 Components:
 	- > Go to Tab "Working with CQL 6.0.0" 
 	- > Test Connection change host name to my-dse and Test & Save. 
   
-   - In Studio : Create Key Space and Tables using : creditcard.sql (FraudDetection/src/main/resources/cassandra/creditcard.cql). 
+   - In Studio : Create Key Space and Tables using : 
+	creditcard.sql (FraudDetection/src/main/resources/cassandra/creditcard.cql). 
 Alternatively import Notebook  FraudDetection_Notebook.tar (present in FraudDetection folder).
 
    - **4 Tables are created :** customer, fraud_transaction, non_fraud_transaction, kafka_offset
@@ -47,29 +48,19 @@ Alternatively import Notebook  FraudDetection_Notebook.tar (present in FraudDete
  4. Now move to Project > FraudDetection and run the requiered jobs as explained below:
   - Job1: FraudDetection/src/main/scala/com/datamantra/spark/jobs/IntialImportToCassandra.scala (Load data in customer, fraud_transaction, non_fraud_transaction tables)
   - Job2: FraudDetection/src/main/scala/com/datamantra/spark/jobs/FraudDetectionTraining.scala (Create 2 Models PreprocessingModel & RandomForestModel @ FraudDetection/src/main/resources/spark/training using Spark ML)
-  - Job3 : To run DstreamFraudDetection.scala > first we will setup Kafka and then run the Job:
-     -  git clone https://github.com/wurstmeister/kafka-docker
-     - Replace the code in kafka-docker > docker-compose.yml with:
-	 
-	```
-	version: '2'
-	services:
-	  zookeeper:
-	    image: wurstmeister/zookeeper
-	    ports:
-	      - "2181:2181"
-	  kafka:
-	    build: .
-	    ports:
-	      - "9092:9092"
-	    environment:
-	      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
-	      KAFKA_CREATE_TOPICS: "creditcardTransaction"
-	      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-	    volumes:
-	      - /var/run/docker.sock:/var/run/docker.sock
-	 ```	
-     - Go to folder kafka-docker and run docker-compose up -d  (This will run Zookeeper, Kafka @ 9092  with the topic "creditTransaction" alreday created)
+  - Job3 : To run DstreamFraudDetection.scala 
+     > first we will need to RUN KAFKA, Zookeeper and Kafka-UI: 
+  - Go to the current repository root directory where file docker-compose-kafka-echosystem.yml exists and run following command:
+   ```  
+    > docker-compose -f docker-compose-kafka-echosystem.yml up -d
+   ```
+  - Open the Kafka UI  @ localhost:9000 and once you deploy the stream (as we'll see below) - you can monitor all the topics, partitions  and messages. 
+  - Note: Within the yml file, we have mentioned topic as environment variable e.g.
+   ```
+	KAFKA_CREATE_TOPICS: "creditcardTransaction"
+   ```
+   This will create above mentiiond topic automatically. 
+      
      - Now run the Streaming Job which will listen to Kafka Topic : FraudDetection/src/main/scala/com/datamantra/spark/jobs/RealTimeFraudDetection/DstreamFraudDetection.scala 
      - Note: This will not get any messages yet since the Kafaka Topic is empty.Next we will populate the topic with data.
 	  
