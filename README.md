@@ -12,7 +12,10 @@ There are 6 Components:
 
 
 # SETUP
-1. Git Pull for three Repositories : FraudDetection,CreditcardProducer,Fraud-alert-dashboard
+1. Git Pull for three Repositories :  
+	- FraudDetection [https://github.com/guptavinod/FraudDetection](https://github.com/guptavinod/FraudDetection)  
+	- CreditcardProducer [https://github.com/guptavinod/CreditcardProducer](https://github.com/guptavinod/CreditcardProducer)  
+	- Fraud-alert-dashboard [https://github.com/guptavinod/Fraud-alert-dashboard](https://github.com/guptavinod/Fraud-alert-dashboard)  
 
 2. Before starting Jobs we need to have Cassandra in place, here are the steps:
    - Pull Casssandra Image
