@@ -1,18 +1,19 @@
 # Configure Airflow with Mysql
 
-## Create new user and database in Mysql
-   1)Login to Mysql with root credentials
-      mysql -uroot -proot
-   2) CREATE USER 'hduser'@'localhost' IDENTIFIED BY 'hadoop123';
-      GRANT ALL PRIVILEGES ON * . * TO 'hduser'@'localhost';
-      FLUSH PRIVILEGES;
-      EXIT;
+## Create new user and database in Mysql  
+   1) Login to Mysql with root credentials  
+      mysql -uroot -proot  
+      
+   2) CREATE USER 'hduser'@'localhost' IDENTIFIED BY 'hadoop123';  
+      GRANT ALL PRIVILEGES ON * . * TO 'hduser'@'localhost';  
+      FLUSH PRIVILEGES;  
+      EXIT;  
 
-  3) Login as hduser
-      mysql -uhduser -phadoop123
+  3) Login as hduser  
+      mysql -uhduser -phadoop123  
 
-   4) CREATE DATABASE airflow;
-    EXIT;
+   4) CREATE DATABASE airflow;  
+    EXIT;  
 
 ## Change airflow.cfg file to use Mysql database
    cd ~/airflow
