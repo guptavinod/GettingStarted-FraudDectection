@@ -6,7 +6,7 @@ There are 6 Components:
 1. Fraud Detection Core Application (FraudDetection)
 2. Real Time Transaction Simulator  (CreditcardProducer)
 3. Alert Dashboard (Fraud-alert-dashboard)
-4. Airflow Automation and Spark Job Scheduler (Part of FraudDetection > automate folder ---> Not Covered)
+4. Airflow Automation and Spark Job Scheduler (see [Airflow-Automation.md](Airflow-Automation.md))
 5. Cassandra DB & Cassandra UI 
 6. Zookeeper & Kafka Message Broker  
 
