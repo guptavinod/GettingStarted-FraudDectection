@@ -145,5 +145,5 @@ Alternatively import Notebook  FraudDetection_Notebook.tar (present in current r
 	- partition 
 	- offset (Note offset is per partition)
   2. Then ALL the incoming messages contained in DsTREAM RDD are processed first with Prepprocessor Model and than the Feature Column genertaed is passed  into the Random Forest transformation to Predict whether the given message in Fraudant or not.
-  3. Now through CassndraConnetor using prepared statements insert the Fraudant records in Fraud Txn Table and Non-Fraud in Non-Fraud Txn Table and finally update Offeset in Ke-offset Table after each insertion.
+  3. Now through CassndraConnetor using prepared statements insert the Fraudant records in Fraud Txn Table and Non-Fraud in Non-Fraud Txn Table and finally update Offeset in Ke-offset Table after each insertion.  
 
